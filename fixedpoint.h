@@ -305,25 +305,7 @@ public:
     {
         return gen(::abs(x.x));
     }
+
 };
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Integer inversion
-//////////////////////////////////////////////////////////////////////////////////////
-
-namespace detail {
-
-    template <class IntType>
-    IntType inverse(IntType x)
-    {
-        int shift = AnyInt::clz(x);
-        x <<= shift;
-        return (0x7fffffffu - (unsigned)x);
-    }
-
-} /* namespace detail */
-
 
 #endif /* FIXEDPOINT_H */
