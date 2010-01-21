@@ -1,5 +1,5 @@
 #define FRACT_CHECKS_WITH_EXCEPTIONS
-#include "fixedpoint.h"
+#include "../fixedpoint.h"
 #include <QTest>
 #include <QDebug>
 

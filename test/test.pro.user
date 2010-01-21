@@ -10,11 +10,11 @@
  </data>
  <data>
   <variable>RunConfiguration0-ProFile</variable>
-  <value type="QString">fix.pro</value>
+  <value type="QString">test.pro</value>
  </data>
  <data>
   <variable>RunConfiguration0-RunConfiguration.name</variable>
-  <value type="QString">fix</value>
+  <value type="QString">test</value>
  </data>
  <data>
   <variable>RunConfiguration0-UseDyldImageSuffix</variable>
@@ -56,20 +56,9 @@
   <variable>buildConfiguration-Debug</variable>
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
-   <value key="QtVersionId" type="int">0</value>
+   <value key="QtVersionId" type="int">4</value>
    <value key="ToolChain" type="int">0</value>
-   <value key="addQDumper" type=""></value>
    <value key="buildConfiguration" type="int">2</value>
-  </valuemap>
- </data>
- <data>
-  <variable>buildConfiguration-Release</variable>
-  <valuemap type="QVariantMap">
-   <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
-   <value key="QtVersionId" type="int">0</value>
-   <value key="ToolChain" type="int">0</value>
-   <value key="addQDumper" type=""></value>
-   <value key="buildConfiguration" type="int">0</value>
   </valuemap>
  </data>
  <data>
@@ -77,15 +66,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-wsh95O7SBs,guid=7409bd0470839cc65d6a7b784b583af2</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome</value>
     <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
     <value type="QString">GDM_LANG=en_US.UTF-8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
+    <value type="QString">GNOME_KEYRING_PID=2540</value>
+    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-79IsKX/socket</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
     <value type="QString">HOME=/home/rasky</value>
@@ -97,19 +86,20 @@
     <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
     <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
+    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2555,unix/lilax:/tmp/.ICE-unix/2555</value>
     <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SHLVL=0</value>
     <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
+    <value type="QString">SSH_AGENT_PID=2608</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-79IsKX/socket.ssh</value>
     <value type="QString">USER=rasky</value>
     <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-3gA7Oo/database</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
+    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1264073456.719062-2068275413</value>
    </valuelist>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
-    <value type="QString">/home/rasky/src/fix/fix.pro</value>
+    <value type="QString">/home/rasky/src/fix/test/test.pro</value>
     <value type="QString">-spec</value>
     <value type="QString">linux-g++</value>
     <value type="QString">-r</value>
@@ -117,8 +107,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString">/lhome/qtsdk-2009.05/qt/bin/qmake</value>
    <value key="abstractProcess.enabled" type="bool">false</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
-   <value key="buildConfiguration" type=""></value>
+   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix/test</value>
   </valuemap>
  </data>
  <data>
@@ -126,15 +115,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-wsh95O7SBs,guid=7409bd0470839cc65d6a7b784b583af2</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome</value>
     <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
     <value type="QString">GDM_LANG=en_US.UTF-8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
+    <value type="QString">GNOME_KEYRING_PID=2540</value>
+    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-79IsKX/socket</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
     <value type="QString">HOME=/home/rasky</value>
@@ -146,16 +135,17 @@
     <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
     <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
+    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2555,unix/lilax:/tmp/.ICE-unix/2555</value>
     <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SHLVL=0</value>
     <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
+    <value type="QString">SSH_AGENT_PID=2608</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-79IsKX/socket.ssh</value>
     <value type="QString">USER=rasky</value>
     <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-3gA7Oo/database</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
+    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1264073456.719062-2068275413</value>
    </valuelist>
    <value key="abstractProcess.IgnoreReturnValue" type="bool">false</value>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
@@ -163,7 +153,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
    <value key="abstractProcess.enabled" type="bool">true</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix/test</value>
   </valuemap>
  </data>
  <data>
@@ -171,15 +161,15 @@
   <valuemap type="QVariantMap">
    <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Debug</value>
    <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
+    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-wsh95O7SBs,guid=7409bd0470839cc65d6a7b784b583af2</value>
     <value type="QString">DESKTOP_SESSION=gnome</value>
     <value type="QString">DISPLAY=:0.0</value>
     <value type="QString">GDMSESSION=gnome</value>
     <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
     <value type="QString">GDM_LANG=en_US.UTF-8</value>
     <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
+    <value type="QString">GNOME_KEYRING_PID=2540</value>
+    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-79IsKX/socket</value>
     <value type="QString">GTK_MODULES=canberra-gtk-module</value>
     <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
     <value type="QString">HOME=/home/rasky</value>
@@ -191,16 +181,17 @@
     <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
     <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
     <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
+    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2555,unix/lilax:/tmp/.ICE-unix/2555</value>
     <value type="QString">SHELL=/bin/bash</value>
+    <value type="QString">SHLVL=0</value>
     <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
+    <value type="QString">SSH_AGENT_PID=2608</value>
+    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-79IsKX/socket.ssh</value>
     <value type="QString">USER=rasky</value>
     <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
+    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-3gA7Oo/database</value>
     <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
+    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1264073456.719062-2068275413</value>
    </valuelist>
    <value key="abstractProcess.IgnoreReturnValue" type="bool">true</value>
    <valuelist key="abstractProcess.arguments" type="QVariantList">
@@ -209,150 +200,7 @@
    </valuelist>
    <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
    <value key="abstractProcess.enabled" type="bool">true</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
-   <value key="cleanConfig" type="bool">true</value>
-   <valuelist key="makeargs" type="QVariantList">
-    <value type="QString">clean</value>
-   </valuelist>
-  </valuemap>
- </data>
- <data>
-  <variable>buildconfiguration-Release-buildstep0</variable>
-  <valuemap type="QVariantMap">
-   <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
-   <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
-    <value type="QString">DESKTOP_SESSION=gnome</value>
-    <value type="QString">DISPLAY=:0.0</value>
-    <value type="QString">GDMSESSION=gnome</value>
-    <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
-    <value type="QString">GDM_LANG=en_US.UTF-8</value>
-    <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
-    <value type="QString">GTK_MODULES=canberra-gtk-module</value>
-    <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
-    <value type="QString">HOME=/home/rasky</value>
-    <value type="QString">LANG=en_US.UTF-8</value>
-    <value type="QString">LD_LIBRARY_PATH=/lhome/qtsdk-2009.05/lib/qtcreator:</value>
-    <value type="QString">LIBGL_DRIVERS_PATH=/usr/lib/dri</value>
-    <value type="QString">LOGNAME=rasky</value>
-    <value type="QString">ORBIT_SOCKETDIR=/tmp/orbit-rasky</value>
-    <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
-    <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
-    <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
-    <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
-    <value type="QString">USER=rasky</value>
-    <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
-    <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
-   </valuelist>
-   <valuelist key="abstractProcess.arguments" type="QVariantList">
-    <value type="QString">/home/rasky/src/fix/fix.pro</value>
-    <value type="QString">-spec</value>
-    <value type="QString">linux-g++</value>
-    <value type="QString">-r</value>
-   </valuelist>
-   <value key="abstractProcess.command" type="QString">/lhome/qtsdk-2009.05/qt/bin/qmake</value>
-   <value key="abstractProcess.enabled" type="bool">false</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
-   <value key="buildConfiguration" type=""></value>
-  </valuemap>
- </data>
- <data>
-  <variable>buildconfiguration-Release-buildstep1</variable>
-  <valuemap type="QVariantMap">
-   <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
-   <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
-    <value type="QString">DESKTOP_SESSION=gnome</value>
-    <value type="QString">DISPLAY=:0.0</value>
-    <value type="QString">GDMSESSION=gnome</value>
-    <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
-    <value type="QString">GDM_LANG=en_US.UTF-8</value>
-    <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
-    <value type="QString">GTK_MODULES=canberra-gtk-module</value>
-    <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
-    <value type="QString">HOME=/home/rasky</value>
-    <value type="QString">LANG=en_US.UTF-8</value>
-    <value type="QString">LD_LIBRARY_PATH=/lhome/qtsdk-2009.05/lib/qtcreator:</value>
-    <value type="QString">LIBGL_DRIVERS_PATH=/usr/lib/dri</value>
-    <value type="QString">LOGNAME=rasky</value>
-    <value type="QString">ORBIT_SOCKETDIR=/tmp/orbit-rasky</value>
-    <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
-    <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
-    <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
-    <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
-    <value type="QString">USER=rasky</value>
-    <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
-    <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
-   </valuelist>
-   <value key="abstractProcess.IgnoreReturnValue" type="bool">false</value>
-   <valuelist key="abstractProcess.arguments" type="QVariantList">
-    <value type="QString">-w</value>
-   </valuelist>
-   <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
-   <value key="abstractProcess.enabled" type="bool">true</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
-  </valuemap>
- </data>
- <data>
-  <variable>buildconfiguration-Release-cleanstep0</variable>
-  <valuemap type="QVariantMap">
-   <value key="ProjectExplorer.BuildConfiguration.DisplayName" type="QString">Release</value>
-   <valuelist key="abstractProcess.Environment" type="QVariantList">
-    <value type="QString">DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-twINuGog7w,guid=ebbfdd7b19625a9cc84151d04b544e13</value>
-    <value type="QString">DESKTOP_SESSION=gnome</value>
-    <value type="QString">DISPLAY=:0.0</value>
-    <value type="QString">GDMSESSION=gnome</value>
-    <value type="QString">GDM_KEYBOARD_LAYOUT=it</value>
-    <value type="QString">GDM_LANG=en_US.UTF-8</value>
-    <value type="QString">GNOME_DESKTOP_SESSION_ID=this-is-deprecated</value>
-    <value type="QString">GNOME_KEYRING_PID=2392</value>
-    <value type="QString">GNOME_KEYRING_SOCKET=/tmp/keyring-bBjD8e/socket</value>
-    <value type="QString">GTK_MODULES=canberra-gtk-module</value>
-    <value type="QString">GTK_RC_FILES=/etc/gtk/gtkrc:/home/rasky/.gtkrc-1.2-gnome2</value>
-    <value type="QString">HOME=/home/rasky</value>
-    <value type="QString">LANG=en_US.UTF-8</value>
-    <value type="QString">LD_LIBRARY_PATH=/lhome/qtsdk-2009.05/lib/qtcreator:</value>
-    <value type="QString">LIBGL_DRIVERS_PATH=/usr/lib/dri</value>
-    <value type="QString">LOGNAME=rasky</value>
-    <value type="QString">ORBIT_SOCKETDIR=/tmp/orbit-rasky</value>
-    <value type="QString">PATH=/lhome/qtsdk-2009.05/qt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games</value>
-    <value type="QString">PWD=/lhome/qtsdk-2009.05/bin</value>
-    <value type="QString">QTDIR=/lhome/qtsdk-2009.05/qt</value>
-    <value type="QString">SESSION_MANAGER=local/lilax:@/tmp/.ICE-unix/2407,unix/lilax:/tmp/.ICE-unix/2407</value>
-    <value type="QString">SHELL=/bin/bash</value>
-    <value type="QString">SPEECHD_PORT=7090</value>
-    <value type="QString">SSH_AGENT_PID=2454</value>
-    <value type="QString">SSH_AUTH_SOCK=/tmp/keyring-bBjD8e/socket.ssh</value>
-    <value type="QString">USER=rasky</value>
-    <value type="QString">USERNAME=rasky</value>
-    <value type="QString">XAUTHORITY=/var/run/gdm/auth-for-rasky-5Yb10b/database</value>
-    <value type="QString">XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share/:/usr/share/</value>
-    <value type="QString">XDG_SESSION_COOKIE=0852ae41a20d4b53c05fa90b48d3bd71-1263816210.923138-1586735786</value>
-   </valuelist>
-   <value key="abstractProcess.IgnoreReturnValue" type="bool">true</value>
-   <valuelist key="abstractProcess.arguments" type="QVariantList">
-    <value type="QString">clean</value>
-    <value type="QString">-w</value>
-   </valuelist>
-   <value key="abstractProcess.command" type="QString">/usr/bin/make</value>
-   <value key="abstractProcess.enabled" type="bool">true</value>
-   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix</value>
+   <value key="abstractProcess.workingDirectory" type="QString">/home/rasky/src/fix/test</value>
    <value key="cleanConfig" type="bool">true</value>
    <valuelist key="makeargs" type="QVariantList">
     <value type="QString">clean</value>
@@ -363,7 +211,6 @@
   <variable>buildconfigurations</variable>
   <valuelist type="QVariantList">
    <value type="QString">Debug</value>
-   <value type="QString">Release</value>
   </valuelist>
  </data>
  <data>

@@ -11,5 +11,9 @@ QT -= gui
 # Input
 HEADERS += fixedpoint.h \
     anyint.h \
-    fputils.h
+    fputils.h \
+    ../fixedpoint/stringify.h \
+    ../fixedpoint/stringify.h \
+    ../fixedpoint/fputils.h \
+    ../fixedpoint/anyint.h
 SOURCES += test.cpp
