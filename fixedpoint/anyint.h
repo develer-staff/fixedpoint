@@ -44,6 +44,11 @@
 
 namespace AnyInt
 {
+    // Largest integer types supported by the compiler
+    // FIXME: compiler/platform-dependent
+    typedef long long Largest;
+    typedef unsigned long long ULargest;
+
     /////////////////////////////////////////////////////////////////////////
     // clz -- count leading zeros
     // Return the number of leading zero bits in an integer argument.
