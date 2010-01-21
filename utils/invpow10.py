@@ -26,5 +26,5 @@ def make_table(bits, num):
         print "%s, %d," % (hex(x),j)
 
 
-make_table(32, 9)
-make_table(64, 19)
+make_table(32, 10)
+make_table(64, 20)
