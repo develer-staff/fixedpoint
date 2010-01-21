@@ -33,6 +33,8 @@
 #ifndef ANYINT_H
 #define ANYINT_H
 
+//#define FRACT_HAS_128BITS
+
 #include "fputils.h"
 #include <string>
 #include <math.h>
@@ -167,6 +169,20 @@ namespace AnyInt
     template <> struct Unsigned<int32_t> { typedef uint32_t type; };
     template <> struct Unsigned<int64_t> { typedef uint64_t type; };
 
+    //////////////////////////////////////////////////////////////////////////
+    // DoubleType<T> - select the type which is two times bigger than T
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType> struct DoubleType;
+    template <> struct DoubleType<int8_t> { typedef int16_t type; };
+    template <> struct DoubleType<uint8_t> { typedef uint16_t type; };
+    template <> struct DoubleType<int16_t> { typedef int32_t type; };
+    template <> struct DoubleType<uint16_t> { typedef uint32_t type; };
+    template <> struct DoubleType<int32_t> { typedef int64_t type; };
+    template <> struct DoubleType<uint32_t> { typedef uint64_t type; };
+#ifdef FRACT_HAS_128BITS
+    template <> struct DoubleType<int64_t> { typedef int128_t type; };
+    template <> struct DoubleType<uint64_t> { typedef uint128_t type; };
+#endif
 
     //////////////////////////////////////////////////////////////////////////
     // AddOverflow(a,b) - check if there will be an overflow when adding a
