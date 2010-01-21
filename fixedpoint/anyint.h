@@ -219,7 +219,78 @@ namespace AnyInt
         return IntType((bb ^ aa) & (bb ^ diff)) < 0;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    // MulHU(a,b) - get the highest part of the result of an unsigned multiplication
+    //////////////////////////////////////////////////////////////////////////
+    template <class UIntType>
+    UIntType MulHU(UIntType a, UIntType b)
+    {
+        typedef typename Unsigned<typename SelectSmallest<sizeof(UIntType)*2>::type>::type BigUIntType;
 
+        return ((BigUIntType)a * b) >> (sizeof(UIntType)*8);
+    }
+
+    template <> ULargest MulHU(ULargest a, ULargest b);
+#if 0  // FIXME
+    {
+        enum { QUARTER_BITS = sizeof(ULargest)*8 / 4, QUARTER_MASK = (1<<QUARTER_BITS) - 1 };
+        enum { HALF_BITS = sizeof(ULargest)*8 / 2, QUARTER_MASK = (1<<HALF_BITS) - 1 };
+        typedef typename UIntType<typename SelectFastest<HALF_BITS>::type>::type half_t;
+
+        half_t
+            a22 = (a >> (QUARTER_BITS*0)) & QUARTER_MASK,
+            a21 = (a >> (QUARTER_BITS*1)) & QUARTER_MASK,
+            a12 = (a >> (QUARTER_BITS*2)) & QUARTER_MASK,
+            a11 = (a >> (QUARTER_BITS*3)) & QUARTER_MASK,
+            b22 = (b >> (QUARTER_BITS*0)) & QUARTER_MASK,
+            b21 = (b >> (QUARTER_BITS*1)) & QUARTER_MASK,
+            b12 = (b >> (QUARTER_BITS*2)) & QUARTER_MASK,
+            b11 = (b >> (QUARTER_BITS*3)) & QUARTER_MASK,
+            a2 = (a >> (HALF_BITS*0)) & HALF_MASK,
+            a1 = (a >> (HALF_BITS*1)) & HALF_MASK,
+            b2 = (b >> (HALF_BITS*0)) & HALF_MASK,
+            b1 = (b >> (HALF_BITS*1)) & HALF_MASK,
+
+        return ULargest((a21 * b21) >> (HALF_BITS)) +
+               (ULargest(a1) * b1) +
+               (ULargest(b2) * a1) +
+               ((ULargest(a1) * b1) << HALF_BITS);
+    }
+#endif
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // ScaledAdd<N>(a,b,shift) - compute (a+b) >> shift, taking care of not 
+    //  overflowing from the highest bit during the sum.
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    IntType ScaledAdd(IntType a, IntType b, int shift)
+    {
+        return ScaledAdd<sizeof(IntType)*8>(a,b,shift);
+    }
+
+    template <int N, class IntType>
+    IntType ScaledAdd(IntType a, IntType b, int shift)
+    {
+        return (a+b) >> shift;
+    }
+
+    template <class IntType>
+    IntType ScaledAdd<sizeof(IntType)*8,IntType>(IntType a, IntType b, int shift)
+    {
+        typedef typename DoubleType<IntType>::type DIntType;
+        return (DIntType(a) + b) >> n;
+    }
+
+    template <>
+    Largest ScaledAdd<sizeof(Largest)*8,Largest>(Largest a, Largest b, int shift)
+    {
+        // (a+b)>>n =
+        // (a+b) / 2^n =
+        // (a+b)/2 / 2^(n-1) =
+        // (a+(b-a)/2) / 2^(n-1) ==> never overflows!
+        return (a + ((b-a) >> 1)) >> (shift-1);
+    }
 }
 
 
