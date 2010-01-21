@@ -5,9 +5,11 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-CONFIG  += qtestlib
+CONFIG += qtestlib
 QT -= gui
 
 # Input
-HEADERS += fixedpoint.h
+HEADERS += fixedpoint.h \
+    anyint.h \
+    fputils.h
 SOURCES += test.cpp

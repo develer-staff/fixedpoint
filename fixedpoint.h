@@ -28,12 +28,12 @@
 #ifndef FIXEDPOINT_H
 #define FIXEDPOINT_H
 
+#include "fputils.h"
+#include "anyint.h"
 #include <iostream>
-#include <stdint.h>
 #include <stdio.h>
 #include <cassert>
 #include <string>
-#include <stdlib.h>
 #include <math.h>
 
 #ifdef FRACT_CHECKS_WITH_EXCEPTIONS
@@ -70,88 +70,12 @@
     #define DOMAIN_IF(x)   assert(x)
 #endif
 
-#define countof(arr) (sizeof(arr)/sizeof(arr[0]))
-
 
 // Fwd decl
 template <int I, int F>
 class Fract;
 
 namespace detail {
-    /////////////////////////////////////////////////////////////////////////
-    // if_t -- if with types
-    /////////////////////////////////////////////////////////////////////////
-    template <bool COND, typename TRUE_T, typename FALSE_T>
-    struct if_t;
-
-    template <typename TRUE_T, typename FALSE_T>
-    struct if_t<true, TRUE_T, FALSE_T>
-    {
-        typedef TRUE_T type;
-    };
-
-    template <typename TRUE_T, typename FALSE_T>
-    struct if_t<false, TRUE_T, FALSE_T>
-    {
-        typedef FALSE_T type;
-    };
-
-    /////////////////////////////////////////////////////////////////////////
-    // STATIC_ASSERT - compile-time assertions
-    // NOTE: GCC has builtin support for C++0x static_assert(), if activated
-    // on command line with -std=c++0x (useful for debugging)
-    /////////////////////////////////////////////////////////////////////////
-    #ifdef __GXX_EXPERIMENTAL_CXX0X__
-        #define STATIC_ASSERT(x, msg) static_assert(x, msg)
-    #else
-        template <bool> struct StaticAssert;
-        template <> struct StaticAssert<true> { typedef int COMPILE_TIME_ERROR; };
-        #define STATIC_ASSERT(x, msg) typedef typename detail::StaticAssert<(x)>::COMPILE_TIME_ERROR _STATIC_ASSERT_ ## __LINE__
-    #endif
-
-
-    struct error_invalid_type;
-
-    template <int N>
-    struct intselect_fastest
-    {
-        // FIXME: benchmark the fastest integer types on different CPUs.
-        // eg: on x86, 16bits integers are very slow.
-        typedef typename if_t< (N<=8), int8_t,
-            typename if_t< (N<=32), int32_t,
-                typename if_t< (N<=64), int64_t,
-                    error_invalid_type
-                >::type
-            >::type
-        >::type type;
-    };
-
-    template <int N>
-    struct intselect_smallest
-    {
-        typedef typename if_t< (N<=8), int8_t,
-            typename if_t< (N<=16), int16_t,
-                typename if_t< (N<=32), int32_t,
-                    typename if_t< (N<=64), int64_t,
-                        error_invalid_type
-                    >::type
-                >::type
-            >::type
-        >::type type;
-    };
-
-    template <class A, class B>
-    struct Bigger
-    {
-        typedef typename if_t<(sizeof(A)>=sizeof(B)), A, B>::type type;
-    };
-
-    template <class IntType> struct Unsigned;
-    template <> struct Unsigned<int8_t>  { typedef uint8_t type; };
-    template <> struct Unsigned<int16_t> { typedef uint16_t type; };
-    template <> struct Unsigned<int32_t> { typedef uint32_t type; };
-    template <> struct Unsigned<int64_t> { typedef uint64_t type; };
-
 
     template <class T>
     struct FractBuilder
@@ -159,43 +83,6 @@ namespace detail {
         T x;
         FractBuilder(T x_) : x(x_) {}
     };
-
-
-    /////////////////////////////////////////////////////////////////////////
-    // IntAbs - Absolute value for all supported integers
-    /////////////////////////////////////////////////////////////////////////
-    template <class IntType>
-    IntType IntAbs(IntType);
-
-    template<> int IntAbs(int x) { return ::abs(x); }
-    template<> long IntAbs(long x) { return ::labs(x); }
-    template<> long long IntAbs(long long x) { return ::llabs(x); }
-
-    /////////////////////////////////////////////////////////////////////////
-    // Int2String - format integer number to string
-    // This is similar to the non-standard "itoa" provided by some compilers
-    // like Visual Studio.
-    /////////////////////////////////////////////////////////////////////////
-    template <class IntType>
-    std::string Int2String(IntType val, int base=10)
-    {
-        if (val == 0)
-            return "0";
-        char buf[sizeof(IntType)*8] = {0};
-        int i = sizeof(IntType)*8-2;
-        for(; val && i ; --i, val /= base)
-            buf[i] = "0123456789abcdef"[val % base];
-        return &buf[i+1];
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    // IntLog2 - log2 of an integer number
-    //////////////////////////////////////////////////////////////////////////
-    template <class IntType>
-    int IntLog2(IntType x)
-    {
-        return sizeof(IntType)*8 - clz(x);
-    }
 
     //////////////////////////////////////////////////////////////////////////
     // Forward declarations
@@ -213,7 +100,6 @@ namespace detail {
     IntType inverse(IntType x);
 }
 
-
 /////////////////////////////////////////////////////////////////////////
 // fit_in -- check if a signed integer can fit in a specified number of bits
 // Note: this function assumes *signed* integer, and the specified number
@@ -230,67 +116,6 @@ bool fit_in(IntType x, int nbits)
     return int(sizeof(IntType)*8) >= nbits &&
            x <= ~imin && x >= imin;
 }
-
-template <class IntType>
-inline IntType sign(IntType x)
-{
-    return x & (IntType(1) << (sizeof(IntType)*8-1));
-}
-
-template <class IntTypeA, class IntTypeB>
-bool add_overflow(IntTypeA a, IntTypeB b)
-{
-    // Switch to unsigned types to get wrapping beahviour on sum overflow
-    typedef typename detail::Unsigned<
-        typename detail::Bigger<IntTypeA, IntTypeB>::type>
-    ::type UIntType;
-
-    UIntType aa = a, bb = b, sum = aa+bb;
-    return sign((aa ^ sum) & (bb ^ sum));
-}
-
-template <class IntTypeA, class IntTypeB>
-bool sub_overflow(IntTypeA a, IntTypeB b)
-{
-    // Switch to unsigned types to get wrapping beahviour on sum overflow
-    typedef typename detail::Unsigned<
-        typename detail::Bigger<IntTypeA, IntTypeB>::type>
-    ::type UIntType;
-
-    UIntType aa = a, bb = b, diff = aa-bb;
-    return sign((bb ^ aa) & (bb ^ diff));
-}
-
-/////////////////////////////////////////////////////////////////////////
-// clz -- count leading zeros
-// Return the number of leading zero bits in an integer argument.
-// This operation is supported in hardware by most CPU, while it
-// requires an iteration in C. Luckily, GCC provides a builting.
-/////////////////////////////////////////////////////////////////////////
-template <class IntType>
-int clz(IntType x) __attribute__((__always_inline__));
-
-#ifdef __GNUC__
-template <> int clz(int x) __attribute__((__always_inline__));
-template <> int clz(int x) { return __builtin_clz(x); }
-template <> int clz(long x) __attribute__((__always_inline__));
-template <> int clz(long x) { return __builtin_clzl(x); }
-template <> int clz(long long x) __attribute__((__always_inline__));
-template <> int clz(long long x) { return __builtin_clzll(x); }
-#else
-// Generic C implementation (should be used only on hw without clz)
-template <class IntType>
-int clz(IntType x)
-{
-    int c = sizeof(IntType)*8;
-    while (x)
-    {
-        x >>= 1;
-        ++c;
-    }
-    return c;
-}
-#endif
 
 template <class ToType, class FromType>
 inline ToType fx_align(FromType x, int from_bits, int to_bits) __attribute__((__always_inline__));
@@ -325,8 +150,8 @@ class Fract
     STATIC_ASSERT(I > 0, "At least one bit needed in integer part for sign (or use FractU)");
 
 private:
-    typedef typename detail::intselect_fastest<I+F>::type IntType;
-    typedef typename detail::intselect_smallest<I>::type TruncIntType;
+    typedef typename AnyInt::SelectFastest<I+F>::type IntType;
+    typedef typename AnyInt::SelectSmallest<I>::type TruncIntType;
     IntType x;
 
     template <int I2, int F2>
@@ -394,10 +219,10 @@ public:
     }
 
     Fract& operator=(Fract f) { x = f.x; return *this; }
-    Fract operator+(Fract f) { OVERFLOW_IF(add_overflow(x, f.x)); return gen(x+f.x); }
-    Fract operator-(Fract f) { OVERFLOW_IF(sub_overflow(x, f.x)); return gen(x-f.x); }
-    Fract& operator+=(Fract f) { OVERFLOW_IF(add_overflow(x, f.x)); x+=f.x; return *this; }
-    Fract& operator-=(Fract f) { OVERFLOW_IF(sub_overflow(x, f.x)); x-=f.x; return *this; }
+    Fract operator+(Fract f) { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); return gen(x+f.x); }
+    Fract operator-(Fract f) { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); return gen(x-f.x); }
+    Fract& operator+=(Fract f) { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); x+=f.x; return *this; }
+    Fract& operator-=(Fract f) { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); x-=f.x; return *this; }
     bool operator<(Fract<I,F> f) const { return this->x < f.x; }
     bool operator==(Fract<I,F> f) const { return this->x == f.x; }
 
@@ -449,7 +274,7 @@ public:
     // Compute the number of bits of difference between a and b
     static int error(Fract a, Fract b)
     {
-        return detail::IntLog2(detail::IntAbs(a.x - b.x));
+        return AnyInt::Log2Ceil(AnyInt::Abs(a.x - b.x));
     }
 
 public:
@@ -463,7 +288,7 @@ public:
     {
         DOMAIN_IF(x<0);
 
-        IntType temp, val=x.x, g=0, bshft=(detail::IntLog2(val)-1)>>1, b=(1<<bshft);
+        IntType temp, val=x.x, g=0, bshft=(AnyInt::Log2Ceil(val)-1)>>1, b=(1<<bshft);
         do
         {
             if (val >= (temp = ((g + g + b) << bshft)))
@@ -504,7 +329,7 @@ namespace detail {
     template <class IntType>
     IntType inverse(IntType x)
     {
-        int shift = clz(x);
+        int shift = AnyInt::clz(x);
         x <<= shift;
         return (0x7fffffffu - (unsigned)x);
     }
@@ -544,13 +369,13 @@ namespace detail {
         // IntType.
         static IntType div_pow10(int num, int exp, int F)
         {
-            typedef typename Unsigned<IntType>::type UIntType;
+            typedef typename AnyInt::Unsigned<IntType>::type UIntType;
 
             assert(num > 0);
             assert(exp > 0);
             assert(exp*2 < int(countof(Derived::pow10_inv_table)));
 
-            int intbits = IntLog2(num);
+            int intbits = AnyInt::Log2Ceil(num);
 
             UIntType value = (UIntType)Derived::pow10_inv_table[exp*2];
             int value_shift = sizeof(IntType)*8 + Derived::pow10_inv_table[exp*2+1];
@@ -657,7 +482,7 @@ namespace detail {
     template <class IntType>
     std::string toString(IntType value, int F, int prec, bool zeropad)
     {
-        typedef typename Unsigned<IntType>::type UIntType;
+        typedef typename AnyInt::Unsigned<IntType>::type UIntType;
         typedef Pow10Funcs<IntType> Pow10Funcs;
 
         if (prec == -1)
@@ -681,7 +506,7 @@ namespace detail {
         // Add .5 to the last digit of wanted precision
         uvalue += Pow10Funcs::div_pow10(5, prec+1, F);
 
-        integ += Int2String(uvalue >> F) + ".";
+        integ += AnyInt::ToString(uvalue >> F) + ".";
 
         for (int k = 0; k < prec; ++k)
         {
@@ -777,7 +602,7 @@ namespace detail {
     template <class IntType>
     std::string toHex(IntType value)
     {
-        typedef typename Unsigned<IntType>::type UIntType;
+        typedef typename AnyInt::Unsigned<IntType>::type UIntType;
         char buf[sizeof(IntType)*2+3];
 
         UIntType x = (UIntType)value;
