@@ -9,10 +9,7 @@ CONFIG += qtestlib
 QT -= gui
 
 # Input
-HEADERS += fixedpoint.h \
-    anyint.h \
-    fputils.h \
-    ../fixedpoint/stringify.h \
+HEADERS += ../fixedpoint.h \
     ../fixedpoint/stringify.h \
     ../fixedpoint/fputils.h \
     ../fixedpoint/anyint.h
