@@ -36,7 +36,7 @@
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
      template<> char *toString(const Fract<8,24>& x)
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
- }
+}
 
 class TestFixed : public QObject
 {
