@@ -12,5 +12,7 @@ QT -= gui
 HEADERS += ../fixedpoint.h \
     ../fixedpoint/stringify.h \
     ../fixedpoint/fputils.h \
-    ../fixedpoint/anyint.h
+    ../fixedpoint/anyint.h \
+    ../fixedpoint/lazyfract.h \
+    ../fixedpoint/reciprocal.h
 SOURCES += test.cpp
