@@ -120,7 +120,9 @@ namespace detail {
         0x8637bd05, 19,
         0xd6bf94d5L, 23,
         0xabcc7711L, 26,
+        0x89705f41L, 29,
     };
+
     const int Pow10Funcs<int32_t>::log10_table[] =
     {
         0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9
@@ -194,7 +196,8 @@ namespace detail {
         }
 
         // Add .5 to the last digit of wanted precision
-        uvalue += Pow10Funcs::div_pow10(5, prec+1, F);
+        if (prec != Pow10Funcs::MAX_LOG10)
+            uvalue += Pow10Funcs::div_pow10(5, prec+1, F);
 
         integ += AnyInt::ToString(uvalue >> F) + ".";
 
