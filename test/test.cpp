@@ -206,7 +206,7 @@ private slots:
     {
         typedef Fract<2,30> F;
 
-        qWarning() << F(detail::inverse(22194), 31).toString().c_str();
+        //qWarning() << F(detail::inverse(22194), 31).toString().c_str();
     }
 };
 
