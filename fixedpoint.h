@@ -29,9 +29,6 @@
 #define FIXEDPOINT_H
 
 #include "fixedpoint_config.h"
-#include "fixedpoint/fputils.h"
-#include "fixedpoint/anyint.h"
-#include "fixedpoint/stringify.h"
 #include <iostream>
 #include <stdio.h>
 #include <cassert>
@@ -86,6 +83,12 @@ namespace detail {
         FractBuilder(T x_) : x(x_) {}
     };
 }
+
+// Internal functions
+#include "fixedpoint/fputils.h"
+#include "fixedpoint/anyint.h"
+#include "fixedpoint/stringify.h"
+#include "fixedpoint/reciprocal.h"
 
 /////////////////////////////////////////////////////////////////////////
 // fit_in -- check if a signed integer can fit in a specified number of bits
