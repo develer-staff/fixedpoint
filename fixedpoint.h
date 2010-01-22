@@ -160,7 +160,7 @@ private:
 
         x = (IntType(x2 >> F2) << F);
 
-        x2 &= (1 << F2) - 1;
+        x2 &= (IntType(1) << F2) - 1;
         x |= fx_align<IntType>(x2, F2, F);
     }
 
