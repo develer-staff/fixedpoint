@@ -226,15 +226,15 @@ namespace AnyInt
     //////////////////////////////////////////////////////////////////////////
     // MulHU(a,b) - get the highest part of the result of an unsigned multiplication
     //////////////////////////////////////////////////////////////////////////
-    template <class UIntType>
-    UIntType MulHU(UIntType a, UIntType b)
+    template <class IntType>
+    IntType MulHU(IntType a, IntType b, int shift=sizeof(IntType)*8)
     {
-        typedef typename Unsigned<typename SelectSmallest<sizeof(UIntType)*2>::type>::type BigUIntType;
-
-        return ((BigUIntType)a * b) >> (sizeof(UIntType)*8);
+        typedef typename Unsigned<IntType>::type UIntType;
+        typedef typename DoubleType<UIntType>::type DUIntType;
+        return ((DUIntType)(UIntType)a * (UIntType)b) >> shift;
     }
 
-    template <> ULargest MulHU(ULargest a, ULargest b);
+    template <> ULargest MulHU(ULargest a, ULargest b, int shift);
 #if 0  // FIXME
     {
         enum { QUARTER_BITS = sizeof(ULargest)*8 / 4, QUARTER_MASK = (1<<QUARTER_BITS) - 1 };
