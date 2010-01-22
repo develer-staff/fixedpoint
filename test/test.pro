@@ -14,5 +14,6 @@ HEADERS += ../fixedpoint.h \
     ../fixedpoint/fputils.h \
     ../fixedpoint/anyint.h \
     ../fixedpoint/lazyfract.h \
-    ../fixedpoint/reciprocal.h
+    ../fixedpoint/reciprocal.h \
+    ../fixedpoint_config.h
 SOURCES += test.cpp
