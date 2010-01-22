@@ -247,9 +247,24 @@ private slots:
 
     void inverse(void)
     {
-        typedef Fract<2,30> F;
+        typedef Fract<16,16> F;
+        QFETCH(int32_t, a);
+        QFETCH(int32_t, b);
+        QFETCH(int32_t, c);
 
-        //qWarning() << F(detail::inverse(22194), 31).toString().c_str();
+        close(-1);
+        QCOMPARE(reciprocal(F(b)) * F(a), F(c));
+        close(-1);
+        QCOMPARE(reciprocal(F(a)) * F(b), F(reciprocal(F(c))));
+    }
+
+    void inverse_data(void)
+    {
+        QTest::addColumn<int32_t>("a");
+        QTest::addColumn<int32_t>("b");
+        QTest::addColumn<int32_t>("c");
+
+        QTest::newRow("1") << 141 << 47 << 3;
     }
 };
 
