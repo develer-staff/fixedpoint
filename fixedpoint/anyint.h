@@ -44,6 +44,8 @@
 
 namespace AnyInt
 {
+#define bitsof(t)   ((int)sizeof(t)*8)
+
     // Largest integer types supported by the compiler
     // FIXME: compiler/platform-dependent
     typedef long long Largest;
@@ -70,7 +72,7 @@ namespace AnyInt
     template <class IntType>
     int clz(IntType x)
     {
-        int c = sizeof(IntType)*8;
+        int c = bitsof(IntType);
         while (x)
         {
             x >>= 1;
@@ -101,8 +103,8 @@ namespace AnyInt
         if (val == 0)
             return "0";
         assert(base > 0 && base < 16);
-        char buf[sizeof(IntType)*8] = {0};
-        int i = sizeof(IntType)*8-2;
+        char buf[bitsof(IntType)] = {0};
+        int i = bitsof(IntType)-2;
         for(; val && i ; --i, val /= base)
             buf[i] = "0123456789abcdef"[val % base];
         return &buf[i+1];
@@ -114,7 +116,7 @@ namespace AnyInt
     template <class IntType>
     int Log2Ceil(IntType x)
     {
-        return sizeof(IntType)*8 - clz(x);
+        return bitsof(IntType) - clz(x);
     }
 
 
@@ -227,40 +229,37 @@ namespace AnyInt
     // MulHU(a,b) - get the highest part of the result of an unsigned multiplication
     //////////////////////////////////////////////////////////////////////////
     template <class IntType>
-    IntType MulHU(IntType a, IntType b, int shift=sizeof(IntType)*8)
+    IntType MulHU(IntType a, IntType b, int shift=bitsof(IntType))
     {
+        assert(shift >= bitsof(IntType));
         typedef typename Unsigned<IntType>::type UIntType;
         typedef typename DoubleType<UIntType>::type DUIntType;
         return ((DUIntType)(UIntType)a * (UIntType)b) >> shift;
     }
 
-    template <> ULargest MulHU(ULargest a, ULargest b, int shift);
-#if 0  // FIXME
+    template <> ULargest MulHU(ULargest a, ULargest b, int shift)
     {
-        enum { QUARTER_BITS = sizeof(ULargest)*8 / 4, QUARTER_MASK = (1<<QUARTER_BITS) - 1 };
-        enum { HALF_BITS = sizeof(ULargest)*8 / 2, QUARTER_MASK = (1<<HALF_BITS) - 1 };
-        typedef typename UIntType<typename SelectFastest<HALF_BITS>::type>::type half_t;
+        assert(shift >= bitsof(ULargest));
 
-        half_t
-            a22 = (a >> (QUARTER_BITS*0)) & QUARTER_MASK,
-            a21 = (a >> (QUARTER_BITS*1)) & QUARTER_MASK,
-            a12 = (a >> (QUARTER_BITS*2)) & QUARTER_MASK,
-            a11 = (a >> (QUARTER_BITS*3)) & QUARTER_MASK,
-            b22 = (b >> (QUARTER_BITS*0)) & QUARTER_MASK,
-            b21 = (b >> (QUARTER_BITS*1)) & QUARTER_MASK,
-            b12 = (b >> (QUARTER_BITS*2)) & QUARTER_MASK,
-            b11 = (b >> (QUARTER_BITS*3)) & QUARTER_MASK,
-            a2 = (a >> (HALF_BITS*0)) & HALF_MASK,
-            a1 = (a >> (HALF_BITS*1)) & HALF_MASK,
-            b2 = (b >> (HALF_BITS*0)) & HALF_MASK,
-            b1 = (b >> (HALF_BITS*1)) & HALF_MASK,
+        int hs = shift / 2;
+        ULargest hs_mask = (ULargest(1) << hs) - 1;
 
-        return ULargest((a21 * b21) >> (HALF_BITS)) +
-               (ULargest(a1) * b1) +
-               (ULargest(b2) * a1) +
-               ((ULargest(a1) * b1) << HALF_BITS);
+        ULargest
+            ahi = a >> hs,
+            alo = a & hs_mask,
+            bhi = b >> hs,
+            blo = b & hs_mask;
+
+        ULargest mid1 = ((ahi*blo) >> (shift-hs-1));
+        ULargest mid2 = ((alo*bhi) >> (shift-hs-1));
+
+        return ahi*bhi + ScaledAdd(mid1, mid2, 1, bitsof(ULargest)-(shift-hs-1));
     }
-#endif
+
+    template <> Largest MulHU(Largest a, Largest b, int shift)
+    {
+        return (Largest)MulHU((ULargest)a, (ULargest)b, shift);
+    }
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -268,9 +267,9 @@ namespace AnyInt
     //  overflowing from the highest bit during the sum.
     //////////////////////////////////////////////////////////////////////////
     template <class IntType>
-    IntType ScaledAdd(IntType a, IntType b, int shift, int N=sizeof(IntType)*8)
+    IntType ScaledAdd(IntType a, IntType b, int shift, int N=bitsof(IntType))
     {
-        if (N < (int)sizeof(IntType)*8)
+        if (N < bitsof(IntType))
             return (a+b) >> shift;
 
         typedef typename DoubleType<IntType>::type DIntType;
@@ -280,7 +279,7 @@ namespace AnyInt
     template <>
     Largest ScaledAdd<Largest>(Largest a, Largest b, int shift, int N)
     {
-        if (N < (int)sizeof(Largest)*8)
+        if (N < bitsof(Largest))
             return (a+b) >> shift;
 
         // (a+b)>>n =
@@ -295,10 +294,6 @@ namespace AnyInt
     {
         return (Largest)ScaledAdd((Largest)a, (Largest)b, shift, N);
     }
-
 }
-
-
-
 
 #endif // ANYINT_H
