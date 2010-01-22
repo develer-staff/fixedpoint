@@ -28,6 +28,7 @@
 #ifndef FIXEDPOINT_H
 #define FIXEDPOINT_H
 
+#include "fixedpoint_config.h"
 #include "fixedpoint/fputils.h"
 #include "fixedpoint/anyint.h"
 #include "fixedpoint/stringify.h"
