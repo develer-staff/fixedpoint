@@ -38,6 +38,49 @@
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
 }
 
+
+class TestAnyInt : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void mulhu(void)
+    {
+        QCOMPARE(AnyInt::MulHU((uint8_t)245, (uint8_t)38), (uint8_t)36);
+        QCOMPARE(AnyInt::MulHU((uint16_t)48325, (uint16_t)55555), (uint16_t)40965);
+        QCOMPARE(AnyInt::MulHU((uint32_t)3894967294U, (uint32_t)2222222222U), (uint32_t)2015261648U);
+    }
+
+    void addscaled(void)
+    {
+        QCOMPARE(AnyInt::ScaledAdd((uint8_t)245, (uint8_t)245, 1), (uint8_t)245);
+        QCOMPARE(AnyInt::ScaledAdd((uint16_t)55555, (uint16_t)55555, 1), (uint16_t)55555);
+        QCOMPARE(AnyInt::ScaledAdd((uint32_t)3894967294U, (uint32_t)3894967294U, 1), (uint32_t)3894967294U);
+        QCOMPARE(AnyInt::ScaledAdd((uint64_t)11111111111111111111ULL, (uint64_t)11111111111111111111ULL, 1), (uint64_t)11111111111111111111ULL);
+    }
+
+    void addscaled64(void)
+    {
+        QFETCH(uint64_t, a);
+        QFETCH(uint64_t, b);
+        QFETCH(int, shift);
+        QFETCH(uint64_t, c);
+
+        QCOMPARE(AnyInt::ScaledAdd(a,b,shift), c);
+    }
+
+    void addscaled64_data(void)
+    {
+        QTest::addColumn<uint64_t>("a");
+        QTest::addColumn<uint64_t>("b");
+        QTest::addColumn<int>("shift");
+        QTest::addColumn<uint64_t>("c");
+
+        QTest::newRow("1") << uint64_t(124) << uint64_t(124) << 1 << uint64_t(124);
+        QTest::newRow("1") << uint64_t(1999999999999999992ULL) << uint64_t(1999999999999999992ULL) << 2 << uint64_t(999999999999999996ULL);
+    }
+};
+
 class TestFixed : public QObject
 {
     Q_OBJECT
