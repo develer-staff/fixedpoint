@@ -268,33 +268,34 @@ namespace AnyInt
     //  overflowing from the highest bit during the sum.
     //////////////////////////////////////////////////////////////////////////
     template <class IntType>
-    IntType ScaledAdd(IntType a, IntType b, int shift)
+    IntType ScaledAdd(IntType a, IntType b, int shift, int N=sizeof(IntType)*8)
     {
-        return ScaledAdd<sizeof(IntType)*8>(a,b,shift);
-    }
+        if (N < (int)sizeof(IntType)*8)
+            return (a+b) >> shift;
 
-    template <int N, class IntType>
-    IntType ScaledAdd(IntType a, IntType b, int shift)
-    {
-        return (a+b) >> shift;
-    }
-
-    template <class IntType>
-    IntType ScaledAdd<sizeof(IntType)*8,IntType>(IntType a, IntType b, int shift)
-    {
         typedef typename DoubleType<IntType>::type DIntType;
-        return (DIntType(a) + b) >> n;
+        return (DIntType(a) + b) >> shift;
     }
 
     template <>
-    Largest ScaledAdd<sizeof(Largest)*8,Largest>(Largest a, Largest b, int shift)
+    Largest ScaledAdd<Largest>(Largest a, Largest b, int shift, int N)
     {
+        if (N < (int)sizeof(Largest)*8)
+            return (a+b) >> shift;
+
         // (a+b)>>n =
         // (a+b) / 2^n =
         // (a+b)/2 / 2^(n-1) =
         // (a+(b-a)/2) / 2^(n-1) ==> never overflows!
         return (a + ((b-a) >> 1)) >> (shift-1);
     }
+
+    template <>
+    ULargest ScaledAdd<ULargest>(ULargest a, ULargest b, int shift, int N)
+    {
+        return (Largest)ScaledAdd((Largest)a, (Largest)b, shift, N);
+    }
+
 }
 
 
