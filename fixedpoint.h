@@ -147,6 +147,9 @@ private:
     template <int I2, int F2>
     friend class Fract;
 
+    template <class T>
+    friend class detail::LazyFract;
+
 private:
     Fract(detail::FractBuilder<IntType> b) : x(b.x) {}
 
@@ -184,6 +187,12 @@ public:
     explicit Fract(const Fract<I2,F2>& f)
     {
         set(f.x, F2);
+    }
+
+    template <class T>
+    explicit Fract(const detail::LazyFract<T>& f)
+    {
+        *this = f.template toFract<I,F>();
     }
 
     Fract(int i) __attribute__((__always_inline__))
@@ -295,6 +304,20 @@ public:
         return gen(::abs(x.x));
     }
 
+
+    template <class T>
+    friend class detail::LazyReciprocal;
+
+    friend detail::LazyReciprocal<IntType> reciprocal(Fract f)
+    {
+        // On most processors, there is a division opcode using double-words
+        // (eg: x86-32 has a fast "64bit div 32bit" opcode)
+#ifndef FRACT_AVOID_DIVISION
+        if (sizeof(IntType) <= sizeof(long))
+            return gen(Fract<I*2,F*2>(1).x / this->x);
+#endif
+        return detail::LazyReciprocal<IntType>(f);
+    }
 };
 
 #endif /* FIXEDPOINT_H */

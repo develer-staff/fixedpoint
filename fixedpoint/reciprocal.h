@@ -32,15 +32,103 @@
 
 namespace detail
 {
-
-
     template <class IntType>
-    IntType reciprocal(IntType x)
+    class LazyReciprocal : public LazyFract<LazyReciprocal<IntType> >
     {
-        int shift = AnyInt::clz(x);
-        x <<= shift;
-        return (0x7fffffffu - (unsigned)x);
-    }
+    private:
+        IntType input;
+        int input_shift;
+
+    private:
+        template <int PREC>
+        void nr_step(IntType& result, IntType input, int& curprec) const
+        {
+            enum { NBITS = sizeof(IntType)*8 };
+
+            if ((PREC/2) < NBITS)
+            {
+                result = AnyInt::MulHU(result, -AnyInt::MulHU(result, input)) << 1;
+                curprec = (PREC > NBITS) ? (NBITS-2) : PREC;
+            }
+        }
+
+    public:
+        template <int I, int F>
+        LazyReciprocal(Fract<I,F> f)
+            : input(f.x), input_shift(F)
+        {}
+
+    public:
+        IntType evaluate(int prec) const
+        {
+            enum { NBITS = sizeof(IntType)*8 };
+
+            int shift = AnyInt::clz(input);
+            if ((input << shift) == 0)
+                --shift;
+
+            this->result_highestbit = 0;
+            this->result_shift = NBITS + (NBITS-shift) - input_shift;
+
+            IntType input = this->input << shift;
+            if (input == 0)
+                return 1;
+
+            IntType result = 1;
+
+            // 3-bits estimation
+            result = ((~IntType(0) ^ (IntType(1)<<(NBITS-1))) - input);
+            if (prec <= 3)
+                return result;
+
+            int curprec = 3;
+            STATIC_ASSERT(NBITS <= 128, Integer larger than 128 bits are unsupported by the following unrolled loop);
+
+            nr_step<6>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            nr_step<12>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            nr_step<24>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            nr_step<48>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            nr_step<96>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            nr_step<192>(result, input, curprec);
+            if (curprec >= prec)
+                return result;
+
+            // Highest bit is always one at this point
+            assert(result < 0);
+            result <<= 1;
+            curprec--;
+            this->result_highestbit = 1;
+
+            result -= 3;
+
+            result -= AnyInt::MulHU(result, input) + input; curprec++;
+            assert(curprec == NBITS-2);
+            if (curprec >= prec)
+                return result;
+            result -= AnyInt::MulHU(result, input) + input; curprec++;
+            assert(curprec == NBITS-1);
+            if (curprec >= prec)
+                return result;
+            result -= AnyInt::MulHU(result, input) + input; curprec++;
+            assert(curprec == NBITS);
+            return result;
+        }
+    };
 }
 
 #endif // RECIPROCAL_H

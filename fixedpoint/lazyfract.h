@@ -28,7 +28,6 @@
 #ifndef LAZYFRACT_H
 #define LAZYFRACT_H
 
-#include <tr1/tuple>
 #include "anyint.h"
 
 namespace detail {
@@ -60,23 +59,35 @@ namespace detail {
     template <class Derived>
     class LazyFract
     {
+    protected:
+        mutable int result_highestbit;
+        mutable int result_shift;
+
     public:
-        template <int I, int F>
-        Fract<I,F> operator*(LazyFract a, Fract<I,F> b)
+        LazyFract() : result_highestbit(0), result_shift(0)
+        {}
+
+    public:
+        Fract<I,F> LazyFract<Derived>::operator*(Fract<I,F> b) const
         {
             typedef typename Fract<I,F>::IntType IntType;
 
-            IntType inv; int shift, int highestbit;
-            tie(inv,shift, highestbit) = Derived::evaluate<IntType>(I+F);
+            IntType result = static_cast<const Derived*>(this)->evaluate(I+F);
+            assert(result_shift >= (int)sizeof(IntType)*8);
 
-            if (!highestbit)
-                result = AnyInt::MulHU(inv, b.x) >> shift;
+            if (!result_highestbit)
+                result = AnyInt::MulHU(result, b.x, result_shift);
             else
-                result = AnyInt::ScaledAdd<I+F>(AnyInt::MulHU(inv, b.x), b.x, shift);
+                result = AnyInt::ScaledAdd(AnyInt::MulHU(result, b.x), b.x, result_shift - sizeof(IntType)*8);
+            return Fract<I,F>(result, F);
+        }
+
+        template <int I, int F>
+        Fract<I,F> toFract(void) const
+        {
+            return *this * Fract<I,F>(1);
         }
     };
-
-
 
 } /* namespace detail */
 
