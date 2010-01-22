@@ -68,7 +68,8 @@ namespace detail {
         {}
 
     public:
-        Fract<I,F> LazyFract<Derived>::operator*(Fract<I,F> b) const
+        template <int I, int F>
+        Fract<I,F> operator*(Fract<I,F> b) const
         {
             typedef typename Fract<I,F>::IntType IntType;
 
