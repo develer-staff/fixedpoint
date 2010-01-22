@@ -32,6 +32,18 @@
 
 namespace detail
 {
+    /*
+     * The reciprocal algorithm is taken from:
+     * http://ipa.ece.illinois.edu/mif/pubs/web-only/Frank-RawMemo12-1999.html
+     * (mirrored in doc/).
+     *
+     * I don't even attempt to explain it here because it is complicated. The main
+     * idea is to use the standard Newton-Raphson iteration (x' = x*(2 - x*d)), but
+     * the implementation uses lots of clever bit-tricks to speed it up. The seeding
+     * of the iteration is also calculated without a lookup table, again with a
+     * clever trick.
+     */
+
     template <class IntType>
     class LazyReciprocal : public LazyFract<LazyReciprocal<IntType> >
     {
