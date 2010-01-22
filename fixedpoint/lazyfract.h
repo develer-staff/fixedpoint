@@ -73,7 +73,7 @@ namespace detail {
         {
             typedef typename Fract<I,F>::IntType IntType;
 
-            IntType result = static_cast<const Derived*>(this)->evaluate(I+F);
+            IntType result = static_cast<const Derived*>(this)->template evaluate<I+F>();
             assert(result_shift >= (int)sizeof(IntType)*8);
 
             if (!result_highestbit)

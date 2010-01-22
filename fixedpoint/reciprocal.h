@@ -59,7 +59,8 @@ namespace detail
         {}
 
     public:
-        IntType evaluate(int prec) const
+        template <int prec>
+        IntType evaluate() const
         {
             enum { NBITS = sizeof(IntType)*8 };
 
