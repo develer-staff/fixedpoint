@@ -85,9 +85,6 @@ namespace detail {
         T x;
         FractBuilder(T x_) : x(x_) {}
     };
-
-    template <class IntType>
-    IntType inverse(IntType x);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -247,18 +244,6 @@ public:
 
     std::string toHex() const
     { return detail::toHex(x); }
-
-    Fract inverse(void) const
-    {
-        // On most processors, there is a division opcode using double-words
-        // (eg: x86-32 has a fast "64bit div 32bit" opcode)
-        if (sizeof(IntType) <= sizeof(long) && 0)
-            return gen(Fract<I*2,F*2>(1).x / this->x);
-        else
-        {
-            return gen(detail::inverse(this->x));
-        }
-    }
 
 public:
     // Compute the number of bits of difference between a and b
