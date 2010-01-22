@@ -173,6 +173,10 @@ namespace AnyInt
     template <> struct Unsigned<int16_t> { typedef uint16_t type; };
     template <> struct Unsigned<int32_t> { typedef uint32_t type; };
     template <> struct Unsigned<int64_t> { typedef uint64_t type; };
+    template <> struct Unsigned<uint8_t>  { typedef uint8_t type; };
+    template <> struct Unsigned<uint16_t> { typedef uint16_t type; };
+    template <> struct Unsigned<uint32_t> { typedef uint32_t type; };
+    template <> struct Unsigned<uint64_t> { typedef uint64_t type; };
 
     //////////////////////////////////////////////////////////////////////////
     // DoubleType<T> - select the type which is two times bigger than T
