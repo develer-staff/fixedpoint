@@ -239,10 +239,10 @@ private slots:
 
         // WARNING: only use number with exact fixed point and floating point representation
         QTest::newRow("weird1") << "123" << 123.0;
-        //QTest::newRow("weird2") << "123." << 123.0;
-        //QTest::newRow("weird3") << "-123." << -123.0;
-        //QTest::newRow("weird4") << "123.0000" << 123.0;
-        //QTest::newRow("weird5") << ".0" << 0.0;
+        QTest::newRow("weird2") << "123." << 123.0;
+        QTest::newRow("weird3") << "-123." << -123.0;
+        QTest::newRow("weird4") << "123.0000" << 123.0;
+        QTest::newRow("weird5") << ".0" << 0.0;
     }
 
     void inverse(void)
