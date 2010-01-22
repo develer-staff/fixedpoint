@@ -1,0 +1,408 @@
+<html>
+
+<head>
+	<title>Calculating Integer Reciprocals</title>
+</head>
+
+<body>
+        <h1>DESIGN OF AN INTEGER RECIPROCAL ALGORTIHM</h1>
+	<h2><a href = "http://www.cag.lcs.mit.edu/~mfrank">Matthew Frank</a></h2>
+	<h2>August 15, 1999</h2>
+<p>
+<h2>Introduction</h2>
+
+<p>
+Division by reciprocal approximation [<a
+href="#ref_fowler89">Fowler89</a>] is a well known design technique
+for reducing the hardware complexity of floating point units and
+providing additional opportunities for compiler optimization [<a
+href="#ref_dally89">Dally89</a>].  A similar technique can also be
+applied to integer division, with the added benefit that the result
+can be made exact [<a href="#ref_alverson91">Alverson91</a>,<a
+href="#ref_granlund94">Granlund94</a>,<a
+href="#ref_magenheimer88">Magenheimer88</a>].  This memo discusses the
+design of an integer division routine written for the Raw processor.
+It makes heavy use Raw's 2 cycle integer mul high instruction to
+perform Newton-Raphson iteration.  The resulting code takes 55 cycles
+to calculate the reciprocal, and another 7 cycles to perform the
+actual division.  The cost of the reciprocal calculation can be
+amortized or eliminated if the divisor is loop invariant or constant.
+The additional of a small amount of hardware support would reduce the
+cost of reciprocal calculation to 34 cycles.
+
+<h2>The Division Technique</h2>
+
+<p>
+We use the same technique implemented for division by constants in the
+gcc compiler [<a href="#ref_granlund94">Granlund94</a>].  The idea is
+to calculate q = floor(n/d), we instead find R = 2^(N+L)/d, where N =
+word width and L = ceil(log2(d)).  Then we can calculate q = (n * R) /
+2^(N+L).  Unfortunately, the reciprocal, R, may require 33 bits and
+even if it doesn't, the multiplication can overflow 32 bits.
+
+<p>
+Instead, we normalize R, so that it <b>always</b> takes 33 bits, and
+bit 33 is always 1.  That is, we let r = 2^(N+L)/d - (2^N - 1) =
+2^N(2^L-d)/d + 1.  Since 2^L-d always fits in 31 bits, this never
+overflows, and since 2^L-d &lt; d, r &lt; 2^N.  Note also that r = R -
+2^N + 1.  This means that we can conceptually find R*n/2^N as
+(r*n)/2^N + n = (r+2^N)*n/2^N = (R+1)*n/2^N = ((R*n)+n)/2^N.  And
+since n &lt; 2^N, this works out to R*n/2^n.
+
+<p>
+Note that we can't just take mulhu(n,r)+n, because it might overflow
+into bit 33.  To avoid overflow while finding the quotient we actually
+take t1 = n*r/2^N = mulhu(n,r) and then q = ((n-t1/2)+t1)/2^(L-1).
+Since r &lt; 2^N, 0 &lt;= t1 &lt;= n, so t1 doesn't overflow.  q =
+((n-t1/2)+t1)/2^(L-1) = ((t1+n)/2)/2^(L-1) = (t1+n)/2^L.
+
+<h2>Finding the Reciprocal</h2>
+
+<p>
+One alternative for calculating this without overflow is to use 64 bit
+integer division, calculating r = 2^N(2^L-d)/d + 1.  To avoid using a
+64 bit division, which is more expensive than the 32 bit division we
+are trying to replace, we can instead calculate the reciprocal using
+Newton-Raphson iteration <a href="#ref_goldberg90">[Goldberg90]</a>.
+The actual code has four interesting features, finding
+L=ceil(log2(d)), getting an initial approximation, normalizing the
+results of the intermediate calculations, and doing the final
+rounding.  Annotated code for the entire routine is shown in the <a
+href="#appendix_a">Appendix</a>.
+
+<p>
+A few instruction sets (e.g. power pc) include an instruction called
+<b>count leading zeros</b> for finding floor(log2(d)).  Since Raw has
+no such instruction, we instead use the truncate mode convert to float
+instruction and then extract the exponent.  Round to nearest mode
+convert to float doesn't work because it will often round up to the
+next exponent.  Unfortunately, our algorithm requires ceil(log2(d))
+instead of floor, so we always add 1, unless d is a power of two.
+Finding the log using this technique takes 8 cycles on Raw.
+
+<p>
+The routine uses a very simple linear function to find an initial
+approximation, which requires only three cycles to calculate.  First
+we normalize d to the range [1.0, 2.0) with the fixed point just below
+the high bit (bit 31), call this result align_d.  We want to generate
+an estimate of the inverse, where the fixed point for the inverse is
+just <b>above</b> the high bit, so these are numbers in the range
+[0.5, 1.0).  But thinking of them in terms of the fixed point being
+below bit 31, they are in the range [1.0, 2.0), just like align_d.
+
+<p>
+We use bit trickery here: we take (1.0 - 1ulp) - align_d,
+which is a negative number in the range (0, -1.0], but since
+we treat negatives as positives this ends up being the line
+3.0 - align_d (range 2.0-&gt;1.0).  When we think of the binary
+point as being above the high bit, then this is the function
+(3-align_d)/2 (range [0.5,1.0)), which is a pretty good
+estimate (on the high side) for 1/d.  Accurate to better than
+3 bits of precision.
+
+<p>
+Two other alternatives would be to use a table lookup, which would
+consume precious data memory on Raw, or to use the floating point
+divider to get an initial approximation, accurate to 24 bits.
+Interestingly, the floating point divider turns out <b>not</b> to be
+especially helpful.  The reason is that each Newton iteration takes
+only 6 cycles, so it takes only 21 cycles to calculate the first 24
+bits using only integer instructions.
+
+<p>
+The problem with using the floating point divider is that there is a
+large cost to converting the result to and from floating point to
+integer.  The basic cost is 2 cycles to construct the numerator, 9
+cycles for the actual divide and then 5 cycles to extract the mantissa
+(it also takes 2 cycles to convert d to float, but we already did that
+while calculating log(d)) .  Worse, because floating point only uses
+24 bits, and rounds everything, the result may not be normalized as
+required for the final iteration.  Doing this final normalization
+requires extracting the exponent and doing an additional shift, which
+requires another 3 cycles.  In sum, then, using the floating point
+divider takes 19 cycles to compute the first 24 bits.  A surprisingly
+small savings of only 2 cycles.
+
+<p>
+The actual Newton iterations can be done very quickly with integer
+arithmetic.  We leverage a few tricks to get each iteration in 6
+cycles (2 mulhus, 1 subtract, and a shift).  The basic iterative
+function is i' = i * (2.0 - i * d).
+
+<p>
+The first bit of trickery has to do with avoiding normalization.  inv
+is a number in range [0.5,1), with the binary point <b>above</b> the
+top bit.  align_d is a number in range (1.0,2.0), with the binary
+point just <b>below</b> the top bit.  When we mulhu then, we get a
+number in the range (0.5,2.0).  Better: since inv is accurate to three
+bits, the result can differ from 1.0 by at most align_d/8.  So the
+result is in the range (0.875,1.25).  The binary point is just below
+the top bit.
+
+<p>
+Next we use another bit of trickery.  When 1.0 is represented by
+0x80000000, then 2.0 is represented by 0x100000000 (33 bits), so we
+can calculate 2.0-x, by simply using 0-x.  The resulting number, call
+it tmp, is in the range (0.75,1.125).
+
+<p>
+Finally, we multiply by inv again.  Note where we are though: suppose
+inv = 1/d + e.  Then tmp = 2.0 - (1/d + e) d = 1.0 - de.  So inv * tmp
+= (1/d + e) (1.0 - de) = 1/d - e^2 d.  Since 1/d &lt; 1.0, the result
+must be less than 1.
+
+<p>
+The result is also at least 0.5.  We already have that inv1 = 1/d -
+e^2d.  inv &gt;= 0.5 gives emax^2 &lt;= (2-d)/2d^2.  But the worst e is the
+initial estimate inv0 = (3-d)/2.  In this case e0^2 = (inv0 - 1/d)^2 =
+(d-1)^2 (d-2)^2 / 4d^2.  Divide e0^2 by emax^2, and the result is less
+than 1 for the entire range of d [1.0,2.0].  So e is always less than
+(2-d)/2d^2, and so inv is always &gt;= 0.5.
+
+<p>
+Since 0.5 &lt;= inv &lt; 1.0, the high bit is always 0.  We shift left by 1
+to normalize the result (so the binary point will always be just above
+the high bit).
+
+<p>
+After our final iteration, the last two bits of inv are inaccurate.
+The last bit is wrong because we simply shifted in a zero when we did
+the last normalization.  The next to last bit is also wrong, because
+the intermediate results also lose some precision, so it may not be
+rounded correctly.  Worse, we actually need to generate 33 bits
+(including the top bit which gets shifted off), so we still need to
+calculate the last three bits of the result to perfect precision.  We
+calculate the final three bits one bit at a time, at a cost of 4
+cycles per bit.  The basic technique is to multiply inv by d and see
+whether the answer is too low, in which case we increment inv by a
+small amount.
+
+<h2>Where Next?</h2>
+
+<p>
+The total cost of the integer division routine is broken down as
+follows: 2 cycles to special case divide by 1, 2 cycles to special
+case divide by power of 2, 8 cycles to get the log, 2 cycles to align
+d, 3 cycles for the intial linear approximation, 24 cycles to iterate
+the result to 30 bits, 14 cycles to shift off the hidden bit and
+calculate the last 3 bits of the inverse, and finally 7 cycles to
+actually compute the quotient.  This is a total of 62 cycles.
+
+<p>
+There is some prospect that a minimal amount of hardware support could
+considerably improve the running time of this code.  For example, an
+integer logarithm instruction could shave 7 cycles off the cost, and
+an 8 bit table lookup in ROM could also eliminate the first two Newton
+iterations (this ROM table already exists for the FP divider),
+reducing the cost by 14 cycles.  Together these two optimizations
+would reduce the total cost of a divide from 62 cycles to 41 cycles.
+It is unlikely that there are many improvements available beyond that,
+although it might be possible to speed up the calculation of the last
+three bits of the reciprocal, which currently requires 12 cycles.
+
+<p>
+Although this reciprocal code has been exhaustively tested (against
+all 2^32 unsigned integers), it has yet to be put into practice.  This
+is because a 36 cycle hardware SRT divider has recently been added to
+the Raw processor (about half the cost of our 62 cycle software
+routine).
+
+<p>
+An alternative idea, that this experiment has brought to light, is
+that it might be generally useful to split the calculation of the
+reciprocal from the actual division.  As shown by gcc for division by
+constants, once the reciprocal is calculated for a particular divisor,
+each additional division operation can be done at a cost of 7 cycles.
+So for loop invariant divisors, we could lift the reciprocal
+calculation out of the loop.  The trick is to be able to find the 33
+bit reciprocal quickly.
+
+<a name = "appendix_a">
+<h2>Appendix A: The code</h2>
+
+<tt><pre>
+static inline
+int
+get_log(unsigned d)
+{
+  /* we use trunc instead of round to avoid rounding the exponent up */
+  float fd = _ieee754_trunc(d);
+  unsigned ifd = _cvt_float2int(fd);
+  int l = _ieee754_get_exponent(ifd); /* always a number in range [0,31] inclusive */
+  unsigned remainder = d - (1 &lt;&lt; l); /* detect the case of d = 2^l */
+
+  return l + (remainder &gt; 0); /* a number in the range [0,32] inclusive */
+}
+
+static inline
+unsigned
+do_the_divide(unsigned n, unsigned d)
+{
+  if (d == 1) {
+    return n;
+  }
+  else {
+    int log = get_log(d);
+    unsigned align_d = d &lt;&lt; (32 - log);
+    unsigned inv = 1;
+
+    /* if d is a power of 2 then align_d overflows (align_d == 0), the
+       proper result in this case is inv = 1. */
+    if (align_d != 0) {
+      /* align_d is normalized to the range [1.0, 2.0) with the fixed
+         point just below the high bit (bit 31).  We want to generate
+         an estimate of the inverse, where the fixed point for the
+         inverse is just ABOVE the high bit, so these are numbers in
+         the range [0.5, 1.0).  But thinking of them in terms of the
+         fixed point being below bit 31, they are in the range [1.0,
+         2.0), just like align_d. */
+      /* We use bit trickery here: we take (1.0 - 1ulp) - align_d,
+         which is a negative number in the range (0, -1.0], but since
+         we treat negatives as positives this ends up being the line
+         3.0 - align_d (range 2.0-&gt;1.0).  When we think of the binary
+         point as being above the high bit, then this is the function
+         (3-align_d)/2 (range [0.5,1.0)), which is a pretty good
+         estimate (on the high side) for 1/d.  Accurate to better than
+         3 bits of precision. */
+      inv = 0x7fffffff - align_d;
+
+      /* newton's iteration:  i' = i * (2.0 - i * d) */
+      /* Trickery: inv is a number in range [0.5,1), with the binary
+         point ABOVE the top bit.  align_d is a number in range
+         (1.0,2.0), with the binary point just BELOW the top bit.
+         When we mulhu then, we get a number in the range (0.5,2.0).
+         Better: since inv is accurate to three bits, the result can
+         differ from 1.0 by at most align_d/8.  So the result is in the
+         range (0.875,1.25).  The binary point is just below the top
+         bit.
+
+         Next we use another bit of trickery.  When 1.0 is represented
+         by 0x80000000, then 2.0 is represented by 0x100000000 (33
+         bits), so we can calculate 2.0-x, by simply using 0-x.  The
+         resulting number, call it &lt;tmp&gt;, is in the range
+         (0.75,1.125).
+
+         Finally, we multiply by inv again.  Note where we are though:
+         suppose inv = 1/d + e.  Then tmp = 2.0 - (1/d + e) d = 1.0 -
+         de.  So inv * tmp = (1/d + e) (1.0 - de) = 1/d - e^2 d.
+         Since 1/d &lt; 1.0, the result must be less than 1.
+
+         The result is also at least 0.5.  We already have that inv1 =
+         1/d - e^2d.  inv &gt;= 0.5 gives emax^2 &lt;= (2-d)/2d^2.  But the
+         worst e is the initial estimate inv0 = (3-d)/2.  In this case
+         e0^2 = (inv0 - 1/d)^2 = (d-1)^2 (d-2)^2 / 4d^2.  Divide e0^2
+         by emax^2, and the result is less than 1 for the entire range
+         of d [1.0,2.0].  So e is always less than (2-d)/2d^2, and so
+         inv is always &gt;= 0.5.
+
+         Since 0.5 &lt;= inv &lt; 1.0, the high bit is always 0.  We shift
+         left by 1 to normalize the result (so the binary point will
+         always be just above the high bit).
+         */
+      inv = mulhu(inv, - mulhu(inv, align_d)) &lt;&lt; 1; /* precision: 6 bits */
+      inv = mulhu(inv, - mulhu(inv, align_d)) &lt;&lt; 1; /* precision: 12 bits */
+      inv = mulhu(inv, - mulhu(inv, align_d)) &lt;&lt; 1; /* precision: 24 bits */
+      /* on the last iteration we lose some precision because all our ops
+         are only 32 bit */
+      inv = mulhu(inv, - mulhu(inv, align_d)) &lt;&lt; 1; /* 30 bits */
+
+      /* The high bit is always one, so shift it off (just like hidden
+         bit in floating point) */
+      inv = inv &lt;&lt; 1;
+      /* the last three bits of inv are inaccurate.  The error is in
+         the range [3,-4], but we want to bias the error to the low
+         side so that it will be in range [0,-7] */
+      inv = inv - 3;
+
+      /* inv is 33 bits (with a hidden bit), align_d is 32 bits, but
+         note that (1 + frac) * d = d + frac*d. */
+
+      /* we want (mulhu(inv, align_d) + align_d) to be zero.  If it
+         comes out less than zero we need to increase inv a little bit */
+      inv -= (mulhu(inv, align_d) + align_d); /* 31 bits */
+      inv -= (mulhu(inv, align_d) + align_d); /* 32 bits */
+      inv -= (mulhu(inv, align_d) + align_d); /* 33 bits (including
+                                                 hidden bit) */
+    }
+    {
+      /* Now we calculate the quotient.  To avoid overflow we don't
+         just take (mulhu(inv,n)+n)/2^log, but instead do it in
+         pieces: */
+      int sh2 = log - 1;
+      unsigned t1 = mulhu(inv, n);
+      /* (t1+(n-t1)/2)/2^(log-1) = ((t1+n)/2)/2^(log-1) =
+         (t1+n)/2^log, which is what we wanted, but without any chance
+         of overflow into bit 33. */
+      return (t1 + ((n - t1) &gt;&gt; 1)) &gt;&gt; sh2;
+    }
+  }
+}
+</pre></tt>
+
+<a name = "bibliography">
+<h2>Bibliography</h2>
+
+<dl>
+
+<a name="ref_alverson91">
+<dt>[Alverson91]
+<dd> Robert Alverson,
+     <strong>Integer Division Using Reciprocals</strong>,
+     <cite>Proceedings of the Tenth Symposium on Computer Arithmetic</cite>,
+     pages 186-190, Grenoble, France, June 1991.
+     <p>
+
+<a name="ref_dally89">
+<dt>[Dally89]
+<dd> William J. Dally,
+     <strong>Micro-Optimization of Floating-Point Operations</strong>,
+     <cite>Proceedings of the Third International Conference on
+     Architectural Support for Programming Languages and Operating
+     Systems (ASPLOS-III)</cite>,
+     pages 283-289, Boston, MA, April 3-6, 1989.
+     <p>
+
+<a name="ref_fowler89">
+<dt>[Fowler89]
+<dd> D.L. Fowler and J.E. Smith,
+     <strong>An Accurate, High Speed Implementation of Division by
+     Reciprocal Approximation</strong>,
+     <cite>Proceedings of the Ninth Symposium on Computer Arithmetic</cite>,
+     pages 60-67, September, 1989.
+     <p>
+
+<a name="ref_goldberg90">
+<dt>[Goldberg90]
+<dd> David Goldberg
+     <strong>Appendix A, Computer Arithmetic</strong>, in John
+     L. Hennessy and David A. Patterson, 
+     <cite>Computer Architecture: A Quantitative Approach</cite>,
+     Morgan Kaufmann, San Fransisco, 1990.
+     <p>
+
+<a name="ref_granlund94">
+<dt>[Granlund94]
+<dd> Torbj&ouml;rn Granlund and Peter L. Montgomery,
+     <strong>Division by Invariant Integers using Multiplication</strong>,
+     <cite>Proceedings of the ACM SIGPLAN '94 conference on 
+     Programming Language Design and Implementation (PLDI)</cite>,
+     pages 61-72, Orlando, FL, June 20-24, 1994.
+     <br> [<a
+     href = "http://www.acm.org/pubs/articles/proceedings/pldi/178243/p61-granlund/p61-granlund.pdf"
+     >pdf</a>]
+     <p>
+
+<a name="ref_magenheimer88">
+<dt>[Magenheimer88]
+<dd> Daniel J. Magenheimer, Liz Peters, Karl W. Peters, and Dan Zuras,
+     <strong>Integer Multiplication and Division on the HP Precision
+     Architecture</strong>,
+     <cite>IEEE Transactions on Computers</cite>,
+     37(8):980-990, August 1988.
+     <p>
+
+
+</dl>
+
+
+</body>
