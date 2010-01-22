@@ -226,6 +226,39 @@ namespace AnyInt
     }
 
     //////////////////////////////////////////////////////////////////////////
+    // ScaledAdd<N>(a,b,shift) - compute (a+b) >> shift, taking care of not
+    //  overflowing from the highest bit during the sum.
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    IntType ScaledAdd(IntType a, IntType b, int shift, int N=bitsof(IntType))
+    {
+        if (N < bitsof(IntType))
+            return (a+b) >> shift;
+
+        typedef typename DoubleType<IntType>::type DIntType;
+        return (DIntType(a) + b) >> shift;
+    }
+
+    template <>
+    Largest ScaledAdd<Largest>(Largest a, Largest b, int shift, int N)
+    {
+        if (N < bitsof(Largest))
+            return (a+b) >> shift;
+
+        // (a+b)>>n =
+        // (a+b) / 2^n =
+        // (a+b)/2 / 2^(n-1) =
+        // (a+(b-a)/2) / 2^(n-1) ==> never overflows!
+        return (a + ((b-a) >> 1)) >> (shift-1);
+    }
+
+    template <>
+    ULargest ScaledAdd<ULargest>(ULargest a, ULargest b, int shift, int N)
+    {
+        return (Largest)ScaledAdd((Largest)a, (Largest)b, shift, N);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
     // MulHU(a,b) - get the highest part of the result of an unsigned multiplication
     //////////////////////////////////////////////////////////////////////////
     template <class IntType>
@@ -259,40 +292,6 @@ namespace AnyInt
     template <> Largest MulHU(Largest a, Largest b, int shift)
     {
         return (Largest)MulHU((ULargest)a, (ULargest)b, shift);
-    }
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // ScaledAdd<N>(a,b,shift) - compute (a+b) >> shift, taking care of not 
-    //  overflowing from the highest bit during the sum.
-    //////////////////////////////////////////////////////////////////////////
-    template <class IntType>
-    IntType ScaledAdd(IntType a, IntType b, int shift, int N=bitsof(IntType))
-    {
-        if (N < bitsof(IntType))
-            return (a+b) >> shift;
-
-        typedef typename DoubleType<IntType>::type DIntType;
-        return (DIntType(a) + b) >> shift;
-    }
-
-    template <>
-    Largest ScaledAdd<Largest>(Largest a, Largest b, int shift, int N)
-    {
-        if (N < bitsof(Largest))
-            return (a+b) >> shift;
-
-        // (a+b)>>n =
-        // (a+b) / 2^n =
-        // (a+b)/2 / 2^(n-1) =
-        // (a+(b-a)/2) / 2^(n-1) ==> never overflows!
-        return (a + ((b-a) >> 1)) >> (shift-1);
-    }
-
-    template <>
-    ULargest ScaledAdd<ULargest>(ULargest a, ULargest b, int shift, int N)
-    {
-        return (Largest)ScaledAdd((Largest)a, (Largest)b, shift, N);
     }
 }
 
