@@ -64,15 +64,16 @@ namespace detail
             enum { NBITS = sizeof(IntType)*8 };
 
             int shift = AnyInt::clz(input);
-            if ((input << shift) == 0)
-                --shift;
 
             this->result_highestbit = 0;
-            this->result_shift = NBITS + (NBITS-shift) - input_shift;
+            this->result_shift = NBITS + (NBITS-shift) - input_shift - 1;
 
             IntType input = this->input << shift;
-            if (input == 0)
-                return 1;
+            if ((input << 1) == 0)  // Power of two
+            {
+                --this->result_shift;
+                return input;
+            }
 
             IntType result = 1;
 
@@ -86,33 +87,34 @@ namespace detail
 
             nr_step<6>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             nr_step<12>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             nr_step<24>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             nr_step<48>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             nr_step<96>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             nr_step<192>(result, input, curprec);
             if (curprec >= prec)
-                return result;
+                return result - (AnyInt::MulHU(result, input) << 1);
 
             // Highest bit is always one at this point
             assert(result < 0);
             result <<= 1;
             curprec--;
             this->result_highestbit = 1;
+            this->result_shift += 1;
 
             result -= 3;
 

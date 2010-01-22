@@ -30,11 +30,15 @@
 
      template<> char *toString(const Fract<16,16>& x)
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
+     template<> char *toString(const Fract<20,44>& x)
+     { return toString(x.toString(-1, true) + " " + x.toHex()); }
      template<> char *toString(const Fract<32,32>& x)
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
      template<> char *toString(const Fract<4,12>& x)
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
      template<> char *toString(const Fract<8,24>& x)
+     { return toString(x.toString(-1, true) + " " + x.toHex()); }
+     template<> char *toString(const Fract<8,8>& x)
      { return toString(x.toString(-1, true) + " " + x.toHex()); }
 }
 
@@ -50,6 +54,26 @@ private slots:
         QCOMPARE(AnyInt::MulHU((uint16_t)48325, (uint16_t)55555), (uint16_t)40965);
         QCOMPARE(AnyInt::MulHU((uint32_t)3894967294U, (uint32_t)2222222222U), (uint32_t)2015261648U);
     }
+
+    void mulhu64(void)
+    {
+        QFETCH(uint64_t, a);
+        QFETCH(uint64_t, b);
+        QFETCH(int, shift);
+        QFETCH(uint64_t, c);
+        QCOMPARE(AnyInt::MulHU(a,b,shift), c);
+    }
+
+    void mulhu64_data(void)
+    {
+        QTest::addColumn<uint64_t>("a");
+        QTest::addColumn<uint64_t>("b");
+        QTest::addColumn<int>("shift");
+        QTest::addColumn<uint64_t>("c");
+
+        QTest::newRow("1") << uint64_t(11111111111111111111ULL) << uint64_t(2222222222222222222ULL) << 64 << uint64_t(1338521200599388189ULL);
+    }
+
 
     void addscaled(void)
     {
@@ -247,24 +271,39 @@ private slots:
 
     void inverse(void)
     {
+        typedef Fract<8,8> F0;
         typedef Fract<16,16> F;
+        typedef Fract<20,44> F2;
+        typedef Fract<32,32> F3;
         QFETCH(int32_t, a);
         QFETCH(int32_t, b);
-        QFETCH(int32_t, c);
+        QFETCH(double, c);
 
-        close(-1);
+        if (a >= -128 && a < 128 && b >= -128 && b < 128)
+        {
+            QCOMPARE(reciprocal(F0(b)) * F0(a), F0(c));
+            QCOMPARE(reciprocal(F0(a)) * F0(b), F0(reciprocal(F0(c))));
+        }
+
         QCOMPARE(reciprocal(F(b)) * F(a), F(c));
-        close(-1);
         QCOMPARE(reciprocal(F(a)) * F(b), F(reciprocal(F(c))));
+
+        QCOMPARE(reciprocal(F2(b)) * F2(a), F2(c));
+        QCOMPARE(reciprocal(F2(a)) * F2(b), F2(reciprocal(F2(c))));
+
+        QCOMPARE(reciprocal(F3(b)) * F3(a), F3(c));
+        QCOMPARE(reciprocal(F3(a)) * F3(b), F3(reciprocal(F3(c))));
     }
 
     void inverse_data(void)
     {
         QTest::addColumn<int32_t>("a");
         QTest::addColumn<int32_t>("b");
-        QTest::addColumn<int32_t>("c");
+        QTest::addColumn<double>("c");
 
-        QTest::newRow("1") << 141 << 47 << 3;
+        QTest::newRow("1") << 141 << 47 << 3.0;
+        QTest::newRow("2") << 6544 << 35 << 186.97142857142855;
+        QTest::newRow("3") << 14 << 7 << 2.0;
     }
 };
 
