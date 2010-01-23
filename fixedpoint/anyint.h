@@ -254,6 +254,18 @@ namespace AnyInt
     }
 
     //////////////////////////////////////////////////////////////////////////
+    // ScaledMulOverflow(a,b,n) - check if there will be an overflow when
+    //   calculation (a*b)>>n.
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    bool ScaledMulOverflow(IntType a, IntType b, int shift)
+    {
+        typedef typename DoubleType<IntType>::type DIntType;
+        DIntType result = (DIntType(a) * b) >> shift;
+        return !FitIn(result, bitsof(IntType));
+    }
+
+    //////////////////////////////////////////////////////////////////////////
     // ScaledAdd<N>(a,b,shift) - compute (a+b) >> shift, taking care of not
     //  overflowing from the highest bit during the sum.
     //////////////////////////////////////////////////////////////////////////
@@ -284,6 +296,16 @@ namespace AnyInt
     ULargest ScaledAdd<ULargest>(ULargest a, ULargest b, int shift, int N)
     {
         return (Largest)ScaledAdd((Largest)a, (Largest)b, shift, N);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // MulHS(a,b) - get the highest part of the result of a signed multiplication
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    IntType MulHS(IntType a, IntType b, int shift=bitsof(IntType))
+    {
+        typedef typename DoubleType<IntType>::type DIntType;
+        return ((DIntType)a * b) >> shift;
     }
 
     //////////////////////////////////////////////////////////////////////////

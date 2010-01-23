@@ -199,6 +199,7 @@ public:
     Fract& operator=(Fract f) { x = f.x; return *this; }
     Fract operator+(Fract f) const { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); return gen(x+f.x); }
     Fract operator-(Fract f) const { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); return gen(x-f.x); }
+    Fract operator*(Fract f) const { OVERFLOW_IF(AnyInt::ScaledMulOverflow(x, f.x, F)); return gen(AnyInt::MulHS(x, f.x, F)); }
     Fract& operator+=(Fract f) { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); x+=f.x; return *this; }
     Fract& operator-=(Fract f) { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); x-=f.x; return *this; }
     bool operator<(Fract<I,F> f) const { return this->x < f.x; }
