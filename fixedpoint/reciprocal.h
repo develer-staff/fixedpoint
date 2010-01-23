@@ -74,7 +74,7 @@ namespace detail
         template <int prec>
         IntType evaluate() const
         {
-            enum { NBITS = sizeof(IntType)*8 };
+            enum { NBITS = bitsof(IntType) };
 
             int shift = AnyInt::clz(input);
 
