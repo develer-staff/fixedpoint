@@ -33,8 +33,6 @@
 #ifndef ANYINT_H
 #define ANYINT_H
 
-//#define FRACT_HAS_128BITS
-
 #include "fputils.h"
 #include <string>
 #include <math.h>
