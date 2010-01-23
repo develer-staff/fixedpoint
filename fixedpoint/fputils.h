@@ -67,6 +67,17 @@ namespace detail
         template <> struct StaticAssert<true> { typedef int COMPILE_TIME_ERROR; };
         #define STATIC_ASSERT(x, msg) typedef typename detail::StaticAssert<(x)>::COMPILE_TIME_ERROR _STATIC_ASSERT_ ## __LINE__
     #endif
+
+    #ifndef __GNUC__
+        #define __attribute__(x)
+    #endif
+
+    // INLINE: force inling
+    #define INLINE    __attribute__((__always_inline__))
+
+    // FLATTEN: force recursive inlining of all called functions,
+    //  making the function "flat".
+    #define FLATTEN   __attribute__((__flatten__))
 }
 
 
