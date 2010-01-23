@@ -194,6 +194,36 @@ namespace AnyInt
 #endif
 
     //////////////////////////////////////////////////////////////////////////
+    // IsSignExtension(x) - check if x is only a sign extension (x==0 || x==-1)
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    bool IsSignExtension(IntType x)
+    {
+        typedef typename Unsigned<IntType>::type UIntType;
+
+        // Clever bit-trick to do only one compare/branch
+        UIntType ux = x;
+        return (ux >> (bitsof(IntType)-1)) + ux == 0;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    // FitIn(a,n) - check if the signed number 'a' would fit in only 'n' bits
+    //////////////////////////////////////////////////////////////////////////
+    template <class IntType>
+    bool FitIn(IntType x, int nbits)
+    {
+        assert(bitsof(IntType) >= nbits);
+
+        if (CONSTANT(nbits))
+        {
+            IntType imin = ~IntType(0) << (nbits-1);
+            return x <= ~imin && x >= imin;
+        }
+        else
+            return IsSignExtension(x >> (nbits-1));
+    }
+
+    //////////////////////////////////////////////////////////////////////////
     // AddOverflow(a,b) - check if there will be an overflow when adding a
     //   and b (a+b)
     //////////////////////////////////////////////////////////////////////////
