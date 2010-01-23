@@ -1,5 +1,6 @@
 #define FRACT_CHECKS_WITH_EXCEPTIONS
 #include "../fixedpoint.h"
+#include "../fixedgeom.h"
 #include <QTest>
 #include <QDebug>
 
@@ -307,5 +308,49 @@ private slots:
     }
 };
 
-QTEST_MAIN(TestFixed)
+class TestGeom : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void mod(void)
+    {
+        typedef Vector3D<16,16> V;
+        typedef Fract<16,16> F;
+
+        QFETCH(int, a);
+        QFETCH(int, b);
+        QFETCH(int, c);
+        QFETCH(int, res);
+
+        close(-1);
+        QCOMPARE(V(a, b, c).mod2(), F(res));
+    }
+
+    void mod_data(void)
+    {
+        QTest::addColumn<int>("a");
+        QTest::addColumn<int>("b");
+        QTest::addColumn<int>("c");
+        QTest::addColumn<int>("res");
+
+        QTest::newRow("1") << 4 << 5 << 2 << 45;
+    }
+};
+
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+
+    TestAnyInt t1;
+    QTest::qExec(&t1);
+
+    TestFixed t2;
+    QTest::qExec(&t2);
+
+    TestGeom t3;
+    QTest::qExec(&t3);
+}
+
 #include "test.moc"
