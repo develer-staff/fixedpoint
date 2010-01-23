@@ -69,7 +69,7 @@ namespace detail {
 
     public:
         template <int I, int F>
-        Fract<I,F> operator*(Fract<I,F> b) const
+        Fract<I,F> FLATTEN operator*(Fract<I,F> b) const
         {
             typedef typename Fract<I,F>::IntType IntType;
 
