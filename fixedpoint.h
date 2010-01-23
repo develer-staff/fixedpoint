@@ -218,8 +218,8 @@ public:
     }
 
     Fract& operator=(Fract f) { x = f.x; return *this; }
-    Fract operator+(Fract f) { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); return gen(x+f.x); }
-    Fract operator-(Fract f) { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); return gen(x-f.x); }
+    Fract operator+(Fract f) const { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); return gen(x+f.x); }
+    Fract operator-(Fract f) const { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); return gen(x-f.x); }
     Fract& operator+=(Fract f) { OVERFLOW_IF(AnyInt::AddOverflow(x, f.x)); x+=f.x; return *this; }
     Fract& operator-=(Fract f) { OVERFLOW_IF(AnyInt::SubOverflow(x, f.x)); x-=f.x; return *this; }
     bool operator<(Fract<I,F> f) const { return this->x < f.x; }
@@ -228,9 +228,9 @@ public:
     template <int I2, int F2>
     Fract<I,F>& operator=(Fract<I2,F2> f) { set(f.x, F2); return *this; }
     template <int I2, int F2>
-    Fract<I,F> operator+(Fract<I2,F2> f)  {return *this + Fract<I,F>(f); }
+    Fract<I,F> operator+(Fract<I2,F2> f) const {return *this + Fract<I,F>(f); }
     template <int I2, int F2>
-    Fract<I,F> operator-(Fract<I2,F2> f)  {return *this - Fract<I,F>(f); }
+    Fract<I,F> operator-(Fract<I2,F2> f) const {return *this - Fract<I,F>(f); }
     template <int I2, int F2>
     Fract<I,F>& operator+=(Fract<I2,F2> f)  {return (*this += Fract<I,F>(f)); }
     template <int I2, int F2>
