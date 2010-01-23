@@ -90,23 +90,6 @@ namespace detail {
 #include "fixedpoint/stringify.h"
 #include "fixedpoint/reciprocal.h"
 
-/////////////////////////////////////////////////////////////////////////
-// fit_in -- check if a signed integer can fit in a specified number of bits
-// Note: this function assumes *signed* integer, and the specified number
-// of bits must include the sign bit.
-/////////////////////////////////////////////////////////////////////////
-template <class IntType>
-bool fit_in(IntType x, int nbits) __attribute__((__always_inline__));
-
-template <class IntType>
-bool fit_in(IntType x, int nbits)
-{
-    assert(int(sizeof(IntType)*8) >= nbits);
-    IntType imin = ~IntType(0) << (nbits-1);
-    return int(sizeof(IntType)*8) >= nbits &&
-           x <= ~imin && x >= imin;
-}
-
 template <class ToType, class FromType>
 inline ToType fx_align(FromType x, int from_bits, int to_bits) __attribute__((__always_inline__));
 
@@ -156,12 +139,8 @@ private:
     template <class IntType2>
     void set(IntType2 x2, int F2)
     {
-        OVERFLOW_IF(!fit_in(x2>>F2, I));
-
-        x = (IntType(x2 >> F2) << F);
-
-        x2 &= (IntType(1) << F2) - 1;
-        x |= fx_align<IntType>(x2, F2, F);
+        OVERFLOW_IF(!AnyInt::FitIn(x2>>F2, I));
+        x = fx_align<IntType>(x2, F2, F);
     }
 
     IntType integ(void) const { return x >> F; }
@@ -197,7 +176,7 @@ public:
 
     Fract(int i) __attribute__((__always_inline__))
     {
-        OVERFLOW_IF(!fit_in(i, I));
+        OVERFLOW_IF(!AnyInt::FitIn(i, I));
         x = IntType(i) << F;
     }
 
