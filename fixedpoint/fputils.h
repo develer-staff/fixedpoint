@@ -78,6 +78,9 @@ namespace detail
     // FLATTEN: force recursive inlining of all called functions,
     //  making the function "flat".
     #define FLATTEN   __attribute__((__flatten__))
+
+    // CONSTANT: check if the compiler sees x as a compile-time constant
+    #define CONSTANT(x)  __builtin_constant_p(x)
 }
 
 
